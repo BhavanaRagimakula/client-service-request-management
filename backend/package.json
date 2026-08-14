@@ -1,0 +1,14 @@
+{
+  "name": "client-service-request-management",
+  "version": "1.0.0",
+  "description": "Client Service Request Management API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+  
