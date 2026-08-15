@@ -1,120 +1,110 @@
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
+const PORT = 5000;
 
+app.use(cors());
 app.use(express.json());
 
-let serviceRequests = [
+let requests = [
   {
     id: 1,
-    title: "Unable to access application",
-    description: "User cannot log in to the client portal.",
+    title: "Login issue",
+    description: "Client cannot access the application",
     priority: "High",
     status: "Open"
+  },
+  {
+    id: 2,
+    title: "Password reset",
+    description: "Client requested a password reset",
+    priority: "Medium",
+    status: "Resolved"
   }
 ];
 
-// Health check
-app.get("/", (req, res) => {
-  res.json({
-    message: "Client Service Request Management API is running"
-  });
-});
-
-// GET all service requests
+// GET - Retrieve all service requests
 app.get("/api/requests", (req, res) => {
-  res.json(serviceRequests);
+  res.json(requests);
 });
 
-// GET one service request
+// GET - Retrieve one service request
 app.get("/api/requests/:id", (req, res) => {
   const id = Number(req.params.id);
-
-  const request = serviceRequests.find(
-    (item) => item.id === id
-  );
+  const request = requests.find((item) => item.id === id);
 
   if (!request) {
     return res.status(404).json({
-      message: "Service request not found"
+      error: "Service request not found"
     });
   }
 
   res.json(request);
 });
 
-// CREATE a service request
+// POST - Create a service request
 app.post("/api/requests", (req, res) => {
   const { title, description, priority } = req.body;
 
   if (!title || !description || !priority) {
     return res.status(400).json({
-      message: "Title, description, and priority are required"
+      error: "Title, description, and priority are required"
     });
   }
 
   const newRequest = {
-    id: serviceRequests.length + 1,
+    id: requests.length + 1,
     title,
     description,
     priority,
     status: "Open"
   };
 
-  serviceRequests.push(newRequest);
+  requests.push(newRequest);
 
   res.status(201).json(newRequest);
 });
 
-// UPDATE a service request
+// PUT - Update a service request
 app.put("/api/requests/:id", (req, res) => {
   const id = Number(req.params.id);
-
-  const request = serviceRequests.find(
-    (item) => item.id === id
-  );
+  const request = requests.find((item) => item.id === id);
 
   if (!request) {
     return res.status(404).json({
-      message: "Service request not found"
+      error: "Service request not found"
     });
   }
 
   const { title, description, priority, status } = req.body;
 
-  request.title = title || request.title;
-  request.description = description || request.description;
-  request.priority = priority || request.priority;
-  request.status = status || request.status;
+  if (title) request.title = title;
+  if (description) request.description = description;
+  if (priority) request.priority = priority;
+  if (status) request.status = status;
 
   res.json(request);
 });
 
-// DELETE a service request
+// DELETE - Delete a service request
 app.delete("/api/requests/:id", (req, res) => {
   const id = Number(req.params.id);
-
-  const requestExists = serviceRequests.some(
-    (item) => item.id === id
-  );
+  const requestExists = requests.some((item) => item.id === id);
 
   if (!requestExists) {
     return res.status(404).json({
-      message: "Service request not found"
+      error: "Service request not found"
     });
   }
 
-  serviceRequests = serviceRequests.filter(
-    (item) => item.id !== id
-  );
+  requests = requests.filter((item) => item.id !== id);
 
   res.json({
     message: "Service request deleted successfully"
   });
 });
 
-const PORT = 5000;
-
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
